@@ -1,5 +1,6 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
+from fastapi.responses import RedirectResponse
 from src.app.core.config import settings
 from src.app.core.container import Container
 from src.app.api.v1.endpoints.user import router as user_router
@@ -30,7 +31,7 @@ app.include_router(user_router, prefix="/api/v1/users", tags=["Users"])
 
 @app.get("/")
 async def root():
-    return {"message": "Welcome to PyWarehouse API"}
+    return RedirectResponse(url="/docs", status_code=301)
 
 
 @app.get("/health")
