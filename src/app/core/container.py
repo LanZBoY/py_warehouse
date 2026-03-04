@@ -7,7 +7,7 @@ class Container(containers.DeclarativeContainer):
     # 這裡定義 Wiring 注入的範圍，讓 FastAPI 路由可以直接使用
     wiring_config = containers.WiringConfiguration(
         modules=[
-            "src.app.api.v1.endpoints",  # 假設你的路由在這
+            # "src.app.api.v1.endpoints",  # 暫時註解，等建立 v1 資料夾後再開啟
             "src.app.main",              # 包含入口點
         ]
     )
