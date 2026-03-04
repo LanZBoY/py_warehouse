@@ -2,6 +2,8 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from src.app.core.config import settings
 from src.app.core.container import Container
+from src.app.api.v1.endpoints.user import router as user_router
+from src.app.api.v1.endpoints.auth import router as auth_router
 
 
 @asynccontextmanager
@@ -20,6 +22,10 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title=settings.PROJECT_NAME, lifespan=lifespan)
+
+# 掛載路由
+app.include_router(auth_router, prefix="/api/v1/auth", tags=["Auth"])
+app.include_router(user_router, prefix="/api/v1/users", tags=["Users"])
 
 
 @app.get("/")
