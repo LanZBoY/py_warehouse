@@ -9,7 +9,7 @@ from src.app.core.security.auth import (
     create_access_token,
     hash_password,
 )
-from src.app.api.schemas import UserRead
+from src.app.api.v1.schemas.user import UserRead
 
 
 class AuthService:

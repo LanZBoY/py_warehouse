@@ -2,7 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from dependency_injector.wiring import inject, Provide
 from src.app.core.container import Container
 from src.app.application.user.services import AuthService
-from src.app.api.schemas import BaseResponse, LoginRequest
+from src.app.api.v1.schemas.common import BaseResponse
+from src.app.api.v1.schemas.auth import LoginRequest
 
 router = APIRouter()
 

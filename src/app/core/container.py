@@ -1,9 +1,14 @@
 from dependency_injector import containers, providers
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 import redis.asyncio as redis
+
 from src.app.core.config import settings
 from src.app.infrastructure.repositories.user_repository import UserRepository
+from src.app.infrastructure.repositories.item_repository import ItemRepository
+from src.app.infrastructure.repositories.location_repository import LocationRepository
 from src.app.application.user.services import AuthService, UserService
+from src.app.application.item.services import ItemService
+from src.app.application.location.services import LocationService
 
 
 class Container(containers.DeclarativeContainer):
@@ -12,6 +17,8 @@ class Container(containers.DeclarativeContainer):
         modules=[
             "src.app.api.v1.endpoints.auth",  # 認證路由
             "src.app.api.v1.endpoints.user",  # 使用者管理路由
+            "src.app.api.v1.endpoints.item",  # 物品管理路由
+            "src.app.api.v1.endpoints.location",  # 位置管理路由
             "src.app.main",  # 包含入口點
         ]
     )
@@ -35,8 +42,18 @@ class Container(containers.DeclarativeContainer):
 
     # 3. Repository
     user_repository = providers.Factory(UserRepository, session_factory=session_factory)
+    item_repository = providers.Factory(ItemRepository, session_factory=session_factory)
+    location_repository = providers.Factory(
+        LocationRepository, session_factory=session_factory
+    )
 
     # 4. Application Services
     auth_service = providers.Factory(AuthService, user_repo=user_repository)
 
     user_service = providers.Factory(UserService, user_repo=user_repository)
+
+    item_service = providers.Factory(ItemService, item_repo=item_repository)
+
+    location_service = providers.Factory(
+        LocationService, location_repo=location_repository
+    )

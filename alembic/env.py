@@ -7,8 +7,8 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from alembic import context
 
-from src.app.infrastructure.base import Base
-from src.app.domain.user.models import User
+# 從彙總模型檔案匯入 Base，確保 metadata 包含所有已定義的模型
+from src.app.infrastructure.models import Base
 from src.app.core.config import settings
 
 # this is the Alembic Config object, which provides
