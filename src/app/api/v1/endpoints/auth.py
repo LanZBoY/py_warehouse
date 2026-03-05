@@ -6,11 +6,12 @@ from src.app.api.schemas import BaseResponse, LoginRequest
 
 router = APIRouter()
 
+
 @router.post("/login", response_model=BaseResponse[str])
 @inject
 async def login(
     request: LoginRequest,
-    auth_service: AuthService = Depends(Provide[Container.auth_service])
+    auth_service: AuthService = Depends(Provide[Container.auth_service]),
 ):
     token = await auth_service.authenticate(request.username, request.password)
     if not token:

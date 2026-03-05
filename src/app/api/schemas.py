@@ -6,16 +6,20 @@ from src.app.domain.user.enums import UserRole
 
 T = TypeVar("T")
 
+
 class BaseResponse(BaseModel, Generic[T]):
     data: T
+
 
 class ListResponse(BaseModel, Generic[T]):
     total: int
     data: List[T]
 
+
 class LoginRequest(BaseModel):
     username: str = Field(..., example="admin")
     password: str = Field(..., example="admin123")
+
 
 class UserRead(BaseModel):
     id: UUID

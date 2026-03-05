@@ -4,7 +4,10 @@ from src.app.core.security.auth import decode_access_token
 
 security = HTTPBearer()
 
-async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)) -> dict:
+
+async def get_current_user(
+    credentials: HTTPAuthorizationCredentials = Depends(security),
+) -> dict:
     """
     驗證 Bearer Token 並回傳 Token Payload。
     """
@@ -16,6 +19,7 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
             detail="Invalid or expired token",
         )
     return payload
+
 
 async def admin_required(current_user: dict = Depends(get_current_user)) -> dict:
     """
