@@ -2,35 +2,78 @@
 
 一個基於 Domain-Driven Design (DDD) 原則建構的現代化倉庫管理系統 API。
 
-## 🚀 快速啟動
+## 🚀 開發環境 Setup
+
+> 以下指令皆於 **專案根目錄** (`py_warehouse/`) 執行。
 
 ### 1. 環境準備
-確保你已經安裝了 [uv](https://github.com/astral-sh/uv) (現代化 Python 套件管理器) 與 Docker。
+請先安裝：
+- [uv](https://github.com/astral-sh/uv)（Python 套件 / 虛擬環境管理）
+- Docker 與 Docker Compose
 
-### 2. 啟動基礎設施
+### 2. 設定環境變數
+將範本複製成 `.env`，並依需要修改：
+
 ```bash
-docker-compose up -d
+cp .env.example .env
 ```
 
-### 3. 設定環境變數
-將 `.env.example` (如果有) 拷貝為 `.env` 並填入正確的資料庫連線資訊。
+`.env` 是 **單一來源**，同時被以下兩處讀取：
+- `docker-compose.yml`：`POSTGRES_USER` / `POSTGRES_PASSWORD` / `POSTGRES_DB`（建立 Postgres container 用）
+- `src/app/core/config.py`：`DATABASE_URL` / `REDIS_URL` / `SECRET_KEY` 等（FastAPI 與 Alembic 用）
 
-### 4. 執行資料庫遷移
+> ⚠️ `DATABASE_URL` 的帳密務必與 `POSTGRES_USER` / `POSTGRES_PASSWORD` 一致，否則 app 連不上 DB。
+
+### 3. 安裝相依套件
+```bash
+uv sync
+```
+
+啟用虛擬環境（可選；用 `uv run` 不需要先啟用）：
+```bash
+source .venv/bin/activate
+```
+
+### 4. 啟動基礎設施 (Postgres + Redis)
+```bash
+docker compose up -d
+```
+
+如果之前已有舊 volume 帳密對不上，加 `-v` 重建：
+```bash
+docker compose down -v && docker compose up -d
+```
+
+### 5. 執行資料庫遷移
 ```bash
 uv run alembic upgrade head
 ```
 
-### 5. 啟動服務 (開發模式)
+常用 Alembic 指令：
+```bash
+uv run alembic revision --autogenerate -m "your message"  # 依 models 自動產生 migration
+uv run alembic upgrade head                                # 套用至最新版本
+uv run alembic downgrade -1                                # 倒回上一版
+uv run alembic current                                     # 查看目前版本
+uv run alembic history                                     # 查看歷史
+```
+
+### 6. 啟動 API 服務 (開發模式)
 ```bash
 uv run uvicorn src.app.main:app --reload
 ```
-存取 API 文件：[http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
+
+- API 文件 (Swagger)：<http://127.0.0.1:8000/docs>
+- Health check：<http://127.0.0.1:8000/health>
+
+### 7. 預設管理員帳號
+首次啟動會依 `.env` 的 `ROOT_USER_NAME` / `ROOT_USER_PASSWORD` 建立 root admin，可用 `POST /api/v1/auth/login` 登入取得 JWT。
 
 ---
 
 ## 🛠 開發習慣與規範
 
-本專案遵循嚴格的工程實踐，詳細規範請參考 `GEMINI.md`。
+本專案遵循嚴格的工程實踐。
 
 ### 1. 建築架構 (DDD)
 *   **Domain**: 核心業務邏輯與實體（`src/app/domain`）。
