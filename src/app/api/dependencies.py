@@ -2,6 +2,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from src.app.core.security.auth import decode_access_token
 from src.app.api.v1.schemas.auth import TokenPayload
+from src.app.domain.user.enums import UserRole
 
 security = HTTPBearer()
 
@@ -34,7 +35,7 @@ async def admin_required(
     """
     確保目前使用者具備管理員權限。
     """
-    if current_user.role != "ADMIN":
+    if current_user.role != UserRole.ADMIN:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Admin privilege required",

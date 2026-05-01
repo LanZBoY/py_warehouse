@@ -1,5 +1,5 @@
 import enum
 
 class UserRole(str, enum.Enum):
-    ADMIN = "admin"
-    USER = "user"
+    ADMIN = "ADMIN"
+    USER = "USER"
