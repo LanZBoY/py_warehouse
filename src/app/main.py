@@ -33,11 +33,11 @@ app.include_router(item_router, prefix="/api/v1/items", tags=["Items"])
 app.include_router(location_router, prefix="/api/v1/locations", tags=["Locations"])
 
 
-@app.get("/")
+@app.get("/", summary="導向 API 文件")
 async def root():
     return RedirectResponse(url="/docs", status_code=301)
 
 
-@app.get("/health")
+@app.get("/health", summary="健康檢查")
 async def health_check():
     return {"status": "ok"}

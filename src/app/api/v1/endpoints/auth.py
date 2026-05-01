@@ -8,7 +8,7 @@ from src.app.api.v1.schemas.auth import LoginRequest
 router = APIRouter()
 
 
-@router.post("/login", response_model=BaseResponse[str])
+@router.post("/login", response_model=BaseResponse[str], summary="登入並取得 JWT Token")
 @inject
 async def login(
     request: LoginRequest,
