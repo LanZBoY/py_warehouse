@@ -1,5 +1,6 @@
 from src.app.infrastructure.base import Base
 from src.app.domain.user.models import User
+from src.app.domain.user.refresh_token import RefreshToken
 from src.app.domain.item.models import Item
 from src.app.domain.location.models import Location
 from src.app.domain.stock.models import StockBalance, StockMovement
@@ -8,6 +9,7 @@ from src.app.domain.stock.models import StockBalance, StockMovement
 __all__ = [
     "Base",
     "User",
+    "RefreshToken",
     "Item",
     "Location",
     "StockBalance",

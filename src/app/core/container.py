@@ -4,6 +4,9 @@ import redis.asyncio as redis
 
 from src.app.core.config import settings
 from src.app.infrastructure.repositories.user_repository import UserRepository
+from src.app.infrastructure.repositories.refresh_token_repository import (
+    RefreshTokenRepository,
+)
 from src.app.infrastructure.repositories.item_repository import ItemRepository
 from src.app.infrastructure.repositories.location_repository import LocationRepository
 from src.app.infrastructure.repositories.stock_repository import StockRepository
@@ -45,6 +48,9 @@ class Container(containers.DeclarativeContainer):
 
     # 3. Repository
     user_repository = providers.Factory(UserRepository, session_factory=session_factory)
+    refresh_token_repository = providers.Factory(
+        RefreshTokenRepository, session_factory=session_factory
+    )
     item_repository = providers.Factory(ItemRepository, session_factory=session_factory)
     location_repository = providers.Factory(
         LocationRepository, session_factory=session_factory
@@ -54,7 +60,11 @@ class Container(containers.DeclarativeContainer):
     )
 
     # 4. Application Services
-    auth_service = providers.Factory(AuthService, user_repo=user_repository)
+    auth_service = providers.Factory(
+        AuthService,
+        user_repo=user_repository,
+        refresh_token_repo=refresh_token_repository,
+    )
 
     user_service = providers.Factory(UserService, user_repo=user_repository)
 

@@ -16,7 +16,8 @@ class Settings(BaseSettings):
     # JWT Settings
     SECRET_KEY: str = "your-secret-key"  # 建議由環境變數提供
     ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 30  # 30 days
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60  # 1 hour
+    REFRESH_TOKEN_EXPIRE_DAYS: int = 30  # 30 days
 
     # Root User Initial Settings
     ROOT_USER_NAME: str = "admin"
