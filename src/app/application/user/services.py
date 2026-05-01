@@ -1,5 +1,4 @@
 import uuid
-from datetime import timedelta
 from typing import List, Optional
 from src.app.domain.user.models import User
 from src.app.domain.user.enums import UserRole
@@ -21,7 +20,6 @@ class AuthService:
         if not user or not verify_password(password, user.password_with_salt):
             return None
 
-        # 建立 JWT Token
         access_token = create_access_token(
             data={"sub": str(user.id), "username": user.username, "role": user.role}
         )
@@ -36,8 +34,13 @@ class UserService:
         self, skip: int = 0, limit: int = 10
     ) -> tuple[list[UserRead], int]:
         users, total = await self._user_repo.get_list(skip, limit)
-        # 在 Service 層完成型別轉換，確保回傳的是純資料物件
         return [UserRead.model_validate(u) for u in users], total
+
+    async def get_user(self, user_id: uuid.UUID) -> Optional[UserRead]:
+        user = await self._user_repo.get_by_id(user_id)
+        if not user:
+            return None
+        return UserRead.model_validate(user)
 
     async def create_user(
         self, username: str, password: str, creator_id: uuid.UUID
@@ -52,3 +55,47 @@ class UserService:
         )
         created_user = await self._user_repo.create(new_user)
         return UserRead.model_validate(created_user)
+
+    async def update_role(
+        self, user_id: uuid.UUID, role: UserRole, updater_id: uuid.UUID
+    ) -> Optional[UserRead]:
+        user = await self._user_repo.get_by_id(user_id)
+        if not user:
+            return None
+        user.role = role
+        user.updated_by = updater_id
+        updated = await self._user_repo.update(user)
+        return UserRead.model_validate(updated)
+
+    async def delete_user(self, user_id: uuid.UUID) -> bool:
+        user = await self._user_repo.get_by_id(user_id)
+        if not user:
+            return False
+        await self._user_repo.soft_delete(user)
+        return True
+
+    async def change_password(
+        self, user_id: uuid.UUID, old_password: str, new_password: str
+    ) -> bool:
+        """使用者改自己密碼，需驗證舊密碼。"""
+        user = await self._user_repo.get_by_id(user_id)
+        if not user:
+            return False
+        if not verify_password(old_password, user.password_with_salt):
+            return False
+        user.password_with_salt = hash_password(new_password)
+        user.updated_by = user_id
+        await self._user_repo.update(user)
+        return True
+
+    async def reset_password(
+        self, user_id: uuid.UUID, new_password: str, updater_id: uuid.UUID
+    ) -> bool:
+        """管理員重設他人密碼，不需舊密碼。"""
+        user = await self._user_repo.get_by_id(user_id)
+        if not user:
+            return False
+        user.password_with_salt = hash_password(new_password)
+        user.updated_by = updater_id
+        await self._user_repo.update(user)
+        return True
