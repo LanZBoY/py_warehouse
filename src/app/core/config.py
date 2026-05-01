@@ -23,6 +23,13 @@ class Settings(BaseSettings):
     ROOT_USER_NAME: str = "admin"
     ROOT_USER_PASSWORD: str = "admin123"
 
+    # CORS: 允許前端 dev server 跨 origin 呼叫
+    # 正式環境請覆蓋成實際 domain,例如 ["https://warehouse.example.com"]
+    BACKEND_CORS_ORIGINS: list[str] = [
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+    ]
+
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
 
