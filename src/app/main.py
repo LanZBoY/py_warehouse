@@ -7,6 +7,7 @@ from src.app.api.v1.endpoints.user import router as user_router
 from src.app.api.v1.endpoints.auth import router as auth_router
 from src.app.api.v1.endpoints.item import router as item_router
 from src.app.api.v1.endpoints.location import router as location_router
+from src.app.api.v1.endpoints.stock import router as stock_router
 
 
 @asynccontextmanager
@@ -31,6 +32,7 @@ app.include_router(auth_router, prefix="/api/v1/auth", tags=["Auth"])
 app.include_router(user_router, prefix="/api/v1/users", tags=["Users"])
 app.include_router(item_router, prefix="/api/v1/items", tags=["Items"])
 app.include_router(location_router, prefix="/api/v1/locations", tags=["Locations"])
+app.include_router(stock_router, prefix="/api/v1/stock", tags=["Stock"])
 
 
 @app.get("/", summary="導向 API 文件")

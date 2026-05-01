@@ -6,9 +6,11 @@ from src.app.core.config import settings
 from src.app.infrastructure.repositories.user_repository import UserRepository
 from src.app.infrastructure.repositories.item_repository import ItemRepository
 from src.app.infrastructure.repositories.location_repository import LocationRepository
+from src.app.infrastructure.repositories.stock_repository import StockRepository
 from src.app.application.user.services import AuthService, UserService
 from src.app.application.item.services import ItemService
 from src.app.application.location.services import LocationService
+from src.app.application.stock.services import StockService
 
 
 class Container(containers.DeclarativeContainer):
@@ -19,6 +21,7 @@ class Container(containers.DeclarativeContainer):
             "src.app.api.v1.endpoints.user",  # 使用者管理路由
             "src.app.api.v1.endpoints.item",  # 物品管理路由
             "src.app.api.v1.endpoints.location",  # 位置管理路由
+            "src.app.api.v1.endpoints.stock",  # 庫存管理路由
             "src.app.main",  # 包含入口點
         ]
     )
@@ -46,6 +49,9 @@ class Container(containers.DeclarativeContainer):
     location_repository = providers.Factory(
         LocationRepository, session_factory=session_factory
     )
+    stock_repository = providers.Factory(
+        StockRepository, session_factory=session_factory
+    )
 
     # 4. Application Services
     auth_service = providers.Factory(AuthService, user_repo=user_repository)
@@ -57,3 +63,5 @@ class Container(containers.DeclarativeContainer):
     location_service = providers.Factory(
         LocationService, location_repo=location_repository
     )
+
+    stock_service = providers.Factory(StockService, stock_repo=stock_repository)
