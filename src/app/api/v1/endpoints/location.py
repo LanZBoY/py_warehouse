@@ -17,7 +17,7 @@ from src.app.api.dependencies import get_current_user
 router = APIRouter()
 
 
-@router.get("", response_model=ListResponse[LocationRead])
+@router.get("", response_model=ListResponse[LocationRead], summary="取得位置列表")
 @inject
 async def get_locations(
     skip: int = Query(0, ge=0),
@@ -26,12 +26,10 @@ async def get_locations(
     current_user: TokenPayload = Depends(get_current_user),
 ):
     locations, total = await location_service.get_locations(skip=skip, limit=limit)
-    return ListResponse(
-        total=total, data=[LocationRead.model_validate(l) for l in locations]
-    )
+    return ListResponse(total=total, data=locations)
 
 
-@router.post("", response_model=BaseResponse[LocationRead])
+@router.post("", response_model=BaseResponse[LocationRead], summary="新增位置")
 @inject
 async def create_location(
     location_in: LocationCreate,
@@ -43,10 +41,10 @@ async def create_location(
         note=location_in.note,
         creator_id=current_user.sub,
     )
-    return BaseResponse(data=LocationRead.model_validate(location))
+    return BaseResponse(data=location)
 
 
-@router.get("/{location_id}", response_model=BaseResponse[LocationRead])
+@router.get("/{location_id}", response_model=BaseResponse[LocationRead], summary="取得指定位置")
 @inject
 async def get_location(
     location_id: UUID,
@@ -56,10 +54,10 @@ async def get_location(
     location = await location_service.get_location(location_id)
     if not location:
         raise HTTPException(status_code=404, detail="Location not found")
-    return BaseResponse(data=LocationRead.model_validate(location))
+    return BaseResponse(data=location)
 
 
-@router.put("/{location_id}", response_model=BaseResponse[LocationRead])
+@router.put("/{location_id}", response_model=BaseResponse[LocationRead], summary="更新位置")
 @inject
 async def update_location(
     location_id: UUID,
@@ -75,10 +73,10 @@ async def update_location(
     )
     if not location:
         raise HTTPException(status_code=404, detail="Location not found")
-    return BaseResponse(data=LocationRead.model_validate(location))
+    return BaseResponse(data=location)
 
 
-@router.delete("/{location_id}", response_model=BaseResponse[bool])
+@router.delete("/{location_id}", response_model=BaseResponse[bool], summary="刪除位置")
 @inject
 async def delete_location(
     location_id: UUID,

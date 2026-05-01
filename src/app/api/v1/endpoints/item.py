@@ -13,7 +13,7 @@ from src.app.api.dependencies import get_current_user
 router = APIRouter()
 
 
-@router.get("", response_model=ListResponse[ItemRead])
+@router.get("", response_model=ListResponse[ItemRead], summary="取得物品列表")
 @inject
 async def get_items(
     skip: int = Query(0, ge=0),
@@ -22,10 +22,10 @@ async def get_items(
     current_user: TokenPayload = Depends(get_current_user),
 ):
     items, total = await item_service.get_items(skip=skip, limit=limit)
-    return ListResponse(total=total, data=[ItemRead.model_validate(i) for i in items])
+    return ListResponse(total=total, data=items)
 
 
-@router.post("", response_model=BaseResponse[ItemRead])
+@router.post("", response_model=BaseResponse[ItemRead], summary="新增物品")
 @inject
 async def create_item(
     item_in: ItemCreate,
@@ -37,10 +37,10 @@ async def create_item(
         note=item_in.note,
         creator_id=current_user.sub,
     )
-    return BaseResponse(data=ItemRead.model_validate(item))
+    return BaseResponse(data=item)
 
 
-@router.get("/{item_id}", response_model=BaseResponse[ItemRead])
+@router.get("/{item_id}", response_model=BaseResponse[ItemRead], summary="取得指定物品")
 @inject
 async def get_item(
     item_id: UUID,
@@ -50,10 +50,10 @@ async def get_item(
     item = await item_service.get_item(item_id)
     if not item:
         raise HTTPException(status_code=404, detail="Item not found")
-    return BaseResponse(data=ItemRead.model_validate(item))
+    return BaseResponse(data=item)
 
 
-@router.put("/{item_id}", response_model=BaseResponse[ItemRead])
+@router.put("/{item_id}", response_model=BaseResponse[ItemRead], summary="更新物品")
 @inject
 async def update_item(
     item_id: UUID,
@@ -69,10 +69,10 @@ async def update_item(
     )
     if not item:
         raise HTTPException(status_code=404, detail="Item not found")
-    return BaseResponse(data=ItemRead.model_validate(item))
+    return BaseResponse(data=item)
 
 
-@router.delete("/{item_id}", response_model=BaseResponse[bool])
+@router.delete("/{item_id}", response_model=BaseResponse[bool], summary="刪除物品")
 @inject
 async def delete_item(
     item_id: UUID,
