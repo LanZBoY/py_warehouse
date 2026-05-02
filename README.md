@@ -75,8 +75,8 @@ uv run uvicorn src.app.main:app --reload
 
 本專案遵循嚴格的工程實踐。
 
-### 1. 建築架構 (DDD)
-*   **Domain**: 核心業務邏輯與實體（`src/app/domain`）。
+### 1. 架構設計 (DDD)
+*   **Domain**: 核心業務邏輯與實體（`src/app/domain`，目前包含 `user` / `item` / `location` / `stock`）。
 *   **Application**: 應用服務與 DTO 轉換（`src/app/application`）。
 *   **Infrastructure**: 資料庫實作與外部資源（`src/app/infrastructure`）。
 *   **API**: FastAPI 路由與 Schema 定義（`src/app/api`）。
@@ -90,7 +90,8 @@ uv run uvicorn src.app.main:app --reload
 
 ### 3. 安全與認證
 *   **密碼**: 使用原生 `bcrypt` 進行雜湊（不建議使用已廢棄的 passlib 內部方法）。
-*   **認證**: JWT 基礎認證，API 支援 Bearer Token 自動帶入（Swagger HTTPBearer）。
+*   **認證**: JWT access token + refresh token rotation，登出時撤銷 refresh token；API 支援 Bearer Token 自動帶入（Swagger HTTPBearer）。
+*   **CORS**: 預設允許前端開發伺服器來源，正式環境請於 `.env` 調整。
 
 ---
 
@@ -98,19 +99,27 @@ uv run uvicorn src.app.main:app --reload
 
 1.  **專案初始化**: 建立基礎 DDD 目錄結構與 Dependency Injector 配置。
 2.  **基礎設施建置**: 整合 SQLAlchemy (Async) 與 Redis，解決 Postgres 18+ Docker 掛載相容性問題。
-3.  **使用者系統實作**: 
+3.  **使用者系統實作**:
     - 實作帶有審計欄位的 `BaseAuditModel`。
     - 建立 `User` 模型與 Alembic 遷移邏輯。
     - 初始化 Root User (全零 UUID, Admin 權限)。
+    - 擴充 CRUD：軟刪除、密碼變更端點。
 4.  **API 演進**:
     - 建立通用的 `BaseResponse` 與 `ListResponse` 規範。
     - 實作 JSON 格式登入 API 並分離 Auth/Users 標籤。
     - 抽離安全相依項目 (`dependencies.py`) 供全域使用。
+5.  **核心倉儲領域**:
+    - `Item` / `Location` CRUD 與 Service 層回傳 DTO 重構。
+    - `Stock`：以原子異動紀錄 (movement log) 追蹤 item × location 的庫存平衡。
+6.  **認證強化**: Refresh token rotation 與登出撤銷機制。
+7.  **前後端整合**: 開放前端開發伺服器 CORS 來源。
 
 ---
 
 ## 📝 技術筆記 (Deep Dives)
 更多技術細節請參考 `Note/` 目錄：
 *   [Service 層回傳 DTO 策略](Note/service_layer_dto_strategy.md)
-*   [Python 路徑與執行機制](Note/python_path_and_execution.md)
+*   [SQLAlchemy 型別標註與預設值](Note/sqlalchemy_typing_and_defaults.md)
+*   [快取策略](Note/caching_strategy.md)
 *   [相依注入研究](Note/dependency_injection_study.md)
+*   [Python 路徑與執行機制](Note/python_path_and_execution.md)
